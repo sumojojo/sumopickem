@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fantasy Sumo Team Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      color: #333;
+    }
+    button {
+      padding: 10px 18px;
+      font-size: 1rem;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 0.5rem;
+    }
+    .locked {
+      background-color: #999 !important;
+    }
+    .team {
+      margin-top: 2rem;
+    }
+    .pick {
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Fantasy Sumo Team Generator</h1>
+  <p>Don't know who to pick for your seven-man team? Tap the button below for a randomly generated one.</p>
+  <p>Click "Generate" to build a 7-wrestler team. Lock picks to keep them.</p>
+  <button onclick="generateTeam()">Generate Team</button>
+  <button onclick="rerollTeam()">Reroll Unlocked</button>
+
+  <div class="team" id="teamDisplay"></div>
+
+  <script>
+    const tiers = [
+      { label: "Yokozuna/Ozeki", wrestlers: ["Hoshoryu", "Onosato", "Kotozakura"] },
+      { label: "Sekiwake/Komusubi", wrestlers: ["Daieisho", "Kirishima", "Wakatakakage", "Oshoma", "Takayasu"] },
+      { label: "Maegashira #1-3", wrestlers: ["Aonishiki", "Wakamotoharu", "Oho", "Abi", "Onokatsu", "Kinbozan"] },
+      { label: "Maegashira #4-6", wrestlers: ["Hakuoho", "Tamawashi", "Hiradoumi", "Meisei", "Takerufuji", "Gonoyama"] },
+      { label: "Maegashira #7-10", wrestlers: ["Tobizaru", "Endo", "Sadanoumi", "Ichiyamamoto"] },
+      { label: "Veteran/Returning", wrestlers: ["Asanoyama", "Ichinojo", "Tochinoshin", "Takayasu"] },
+      { label: "Young Prospects", wrestlers: ["Hakuoho", "Kinbozan", "Atamifuji", "Onosato"] }
+    ];
+
+    let team = []; // { tierIndex, pick, locked }
+
+    function generateTeam() {
+      team = tiers.map((tier, i) => ({
+        tierIndex: i,
+        pick: randomChoice(tier.wrestlers),
+        locked: false
+      }));
+      renderTeam();
+    }
+
+    function rerollTeam() {
+      team = team.map((member, i) => {
+        if (member.locked) return member;
+        return {
+          tierIndex: i,
+          pick: randomChoice(tiers[i].wrestlers),
+          locked: false
+        };
+      });
+      renderTeam();
+    }
+
+    function toggleLock(index) {
+      team[index].locked = !team[index].locked;
+      renderTeam();
+    }
+
+    function renderTeam() {
+      const container = document.getElementById("teamDisplay");
+      container.innerHTML = "";
+      team.forEach((member, index) => {
+        const div = document.createElement("div");
+        div.className = "pick";
+        div.innerHTML = `
+          <strong>${tiers[member.tierIndex].label}:</strong> ${member.pick}
+          <br>
+          <button class="${member.locked ? 'locked' : ''}" onclick="toggleLock(${index})">
+            ${member.locked ? 'Unlock' : 'Lock'}
+          </button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function randomChoice(array) {
+      return array[Math.floor(Math.random() * array.length)];
+    }
+  </script>
+</body>
+</html>
